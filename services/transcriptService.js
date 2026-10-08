@@ -36,11 +36,11 @@ class TranscriptService {
       console.error(errors.at(-1));
     }
 
-    const error = new Error('No usable caption track was found for this YouTube video.');
-    error.details = errors;
-    throw error;
-  }
-
+    const error = new Error(
+  `No usable caption track was found. Details: ${errors.join(' | ')}`
+);
+error.details = errors;
+throw error;
   async getViaInnerTube(videoId) {
     const apiUrl = 'https://www.youtube.com/youtubei/v1/player?prettyPrint=false';
 
