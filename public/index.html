@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BorY — Chat with Any YouTube Video</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+</head>
+<body>
+  <!-- ═══ Landing / Home View ═══ -->
+  <div id="landing-view" class="view active">
+    <nav class="top-nav">
+      <div class="nav-brand">
+        <span class="brand-icon">🎬</span>
+        <span class="brand-text">BorY <span class="brand-accent">AI</span></span>
+      </div>
+      <div class="nav-links">
+        <a href="#" onclick="return false">How it works</a>
+        <a href="#" onclick="return false">Features</a>
+        <a href="#" onclick="return false">About</a>
+      </div>
+    </nav>
+
+    <main class="hero">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          AI-Powered Video Understanding
+        </div>
+        <h1 class="hero-title">Chat with Any <span class="gradient-text">YouTube Video</span></h1>
+        <p class="hero-subtitle">Understand videos, ask questions, find exact timestamps, and get clear summaries with AI.</p>
+
+        <div class="url-input-card">
+          <div class="url-input-row">
+            <input type="text" id="url-input" class="url-input" placeholder="Paste a YouTube URL (e.g. https://youtube.com/watch?v=...)" autocomplete="off" />
+            <button id="analyze-btn" class="analyze-btn" onclick="analyzeVideo()">
+              <span class="btn-text">Analyze Video</span>
+              <span class="btn-icon">→</span>
+            </button>
+          </div>
+
+          <div class="input-divider"><span>or</span></div>
+
+          <div class="upload-row">
+            <label class="file-picker">
+              <input id="media-file" type="file" accept="video/*,audio/*" />
+              <span>📁 Choose video/audio</span>
+            </label>
+            <button id="upload-btn" class="upload-btn" onclick="analyzeUploadedMedia()">
+              <span class="btn-text">Transcribe File</span>
+            </button>
+          </div>
+
+          <p class="upload-help">No captions? Upload a video/audio file you own or have permission to process. Maximum 25 MB.</p>
+          <div id="url-error" class="url-error"></div>
+        </div>
+
+        <div class="hero-features">
+          <div class="feature-chip"><span>💡</span> Smart Q&A</div>
+          <div class="feature-chip"><span>⏱️</span> Exact Timestamps</div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="demo-card">
+          <div class="demo-header">
+            <div class="demo-dots"><span></span><span></span><span></span></div>
+            <div class="demo-title">BorY</div>
+          </div>
+          <div class="demo-body">
+            <div class="demo-message user">At what timestamp was inheritance explained?</div>
+            <div class="demo-message ai">
+              <div class="ai-avatar">AI</div>
+              <div>Inheritance was explained around <span class="demo-timestamp">24:35</span> 👆</div>
+            </div>
+            <div class="demo-message user">What are the most important concepts?</div>
+            <div class="demo-message ai">
+              <div class="ai-avatar">AI</div>
+              <div>1. Classes & Objects <span class="demo-timestamp">12:40</span><br>2. Inheritance <span class="demo-timestamp">24:35</span><br>3. Polymorphism <span class="demo-timestamp">41:10</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <section class="how-it-works" id="how-it-works">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Paste a YouTube URL</h3>
+          <p>Any accessible YouTube video — lectures, tutorials, talks, podcasts.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>AI Analyzes the Content</h3>
+          <p>BorY uses captions when available, or transcribes an uploaded media file with speech-to-text.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Chat & Learn</h3>
+          <p>Ask questions, get summaries, and understand the key points of the video.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ═══ Loading View ═══ -->
+  <div id="loading-view" class="view">
+    <div class="loading-container">
+      <div class="loading-animation">
+        <div class="loading-ring"></div>
+        <div class="loading-ring"></div>
+        <div class="loading-ring"></div>
+        <div class="loading-icon">🎬</div>
+      </div>
+      <h2 id="loading-text">Analyzing video...</h2>
+      <p id="loading-subtext">Extracting transcript and preparing AI chat</p>
+    </div>
+  </div>
+
+  <!-- ═══ Workspace View ═══ -->
+  <div id="workspace-view" class="view">
+    <nav class="workspace-nav">
+      <div class="nav-brand" onclick="goHome()" style="cursor:pointer">
+        <span class="brand-icon">🎬</span>
+        <span class="brand-text">BorY <span class="brand-accent">AI</span></span>
+      </div>
+      <button class="nav-back-btn" onclick="goHome()">← New Video</button>
+    </nav>
+
+    <div class="workspace">
+      <!-- Left: Video + Transcript -->
+      <div class="workspace-left">
+        <div class="video-section">
+          <div class="video-player-wrapper">
+            <iframe id="video-iframe" src="" frameborder="0" allowfullscreen></iframe>
+            <video id="local-video" controls playsinline style="display:none"></video>
+          </div>
+          <div class="video-meta">
+            <div class="source-badge" id="source-badge">▶️ YouTube captions</div>
+            <h2 id="video-title"></h2>
+            <p id="video-channel"></p>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="action-btn" onclick="generateSummary('quick')">⚡ Summary</button>
+          <button class="action-btn" onclick="generateSummary('detailed')">📄 Detailed Summary</button>
+          <button class="action-btn" onclick="generateSummary('keypoints')">🔑 Key Points</button>
+        </div>
+
+        <div class="transcript-section">
+          <div class="section-header">
+            <h3>Timestamped Transcript</h3>
+            <input type="text" id="transcript-search" class="transcript-search" placeholder="Search transcript..." oninput="filterTranscript()" />
+          </div>
+          <div id="transcript-list" class="transcript-list"></div>
+        </div>
+      </div>
+
+      <!-- Right: AI Chat -->
+      <div class="workspace-right">
+        <div class="chat-section">
+          <div class="chat-header">
+            <h3>AI Chat</h3>
+            <button class="clear-chat-btn" onclick="clearChat()" title="Clear conversation">🗑️ Clear</button>
+          </div>
+          <div id="chat-messages" class="chat-messages">
+            <div class="chat-welcome">
+              <div class="chat-welcome-icon">🤖</div>
+              <h4>Ask me anything about this video</h4>
+              <p>Try: "At what timestamp was X explained?" or "What are the key concepts?"</p>
+              <div class="chat-suggestions">
+                <button class="suggestion-chip" data-question="What are the most important concepts?">What are the most important concepts?</button>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="chat-input-row">
+              <textarea id="chat-input" class="chat-input" placeholder="Ask a question about the video..." rows="1"></textarea>
+              <button id="chat-send-btn" class="chat-send-btn" onclick="sendMessage()">↑</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output panel for summaries -->
+    <div id="output-panel" class="output-panel">
+      <div class="output-panel-content">
+        <div class="output-panel-header">
+          <h3 id="output-title">Result</h3>
+          <div class="output-panel-actions">
+            <button class="output-copy-btn" onclick="copyOutput()">📋 Copy</button>
+            <button class="output-close-btn" onclick="closeOutputPanel()">✕</button>
+          </div>
+        </div>
+        <div id="output-content" class="output-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Toast notification ═══ -->
+  <div id="toast" class="toast"></div>
+
+  <script src="/marked.min.js"></script>
+  <script src="/app.js?v=one-question"></script>
+</body>
+</html>
