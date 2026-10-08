@@ -1,6 +1,5 @@
-# BorY — Gemini Edition
+# BorY 
 
-BorY is now configured as a **Gemini-only** application.
 
 ## What changed
 
