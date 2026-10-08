@@ -2,7 +2,7 @@ const GeminiClient = require('../utils/geminiClient');
 
 class AIService {
   constructor() {
-    this.gemini = new GeminiProvider();
+    this.gemini = new GeminiClient();
   }
 
   getStatus() {
