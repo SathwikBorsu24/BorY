@@ -2,8 +2,16 @@ const GeminiClient = require('../utils/geminiClient');
 
 class AIService {
   constructor() {
-    this.gemini = new GeminiClient();
-  }
+    this.gemini = new GeminiClient({
+        apiKey: process.env.GEMINI_API_KEY,
+        baseUrl: process.env.GEMINI_BASE_URL,
+        model: process.env.GEMINI_MODEL,
+        fallbackModels: (process.env.GEMINI_FALLBACK_MODELS || '')
+            .split(',')
+            .map(m => m.trim())
+            .filter(Boolean)
+    });
+}
 
   getStatus() {
     return {
